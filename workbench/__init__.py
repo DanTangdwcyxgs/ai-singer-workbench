@@ -1,0 +1,1 @@
+"""AI Singer Workbench package."""
