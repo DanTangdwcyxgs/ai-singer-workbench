@@ -1,0 +1,35 @@
+name: checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile Python
+        run: python -m compileall -q workbench tests
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+      - name: Parse PowerShell scripts
+        shell: powershell
+        run: |
+          $allErrors = @()
+          Get-ChildItem scripts -Filter '*.ps1' | ForEach-Object {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$errors) | Out-Null
+            $allErrors += $errors
+          }
+          if ($allErrors.Count) {
+            $allErrors | Format-List
+            exit 1
+          }
