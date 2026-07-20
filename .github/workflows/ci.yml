@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   test:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -21,7 +21,7 @@ jobs:
       - name: Run tests
         run: python -m unittest discover -s tests -v
       - name: Parse PowerShell scripts
-        shell: powershell
+        shell: pwsh
         run: |
           $allErrors = @()
           Get-ChildItem scripts -Filter '*.ps1' | ForEach-Object {
